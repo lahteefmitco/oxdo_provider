@@ -1,0 +1,3 @@
+enum SaveEditMode {
+  save,edit
+}
