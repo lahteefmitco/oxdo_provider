@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:oxdo_provider/db/database_helper.dart';
 import 'package:oxdo_provider/models/person/person.dart';
@@ -59,160 +61,160 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-    // Watching saveEditMode 
-    _saveEditMode = context.watch<PersonModel>().saveEditMode;
-    // watching person list
-    _personList = context.watch<PersonModel>().personList;
-    // watching personToUpdate
-    _personToUpdate = context.watch<PersonModel>().personToUpdate;
+    return Consumer<PersonModel>(
+      
+      builder: (BuildContext context, PersonModel value, Widget? child) {
+       
+        _personList = value.personList;
+        _saveEditMode = value.saveEditMode;
+        _personToUpdate = value.personToUpdate;
 
-    // For updating
-    if (_personToUpdate != null) {
-      _nameController.text = _personToUpdate!.name;
-      _ageController.text = _personToUpdate!.age.toString();
-    }
+        if (_personToUpdate != null) {
+          _nameController.text = _personToUpdate!.name;
+          _ageController.text = _personToUpdate!.age.toString();
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: AppBar(
-          title: const Text("Provider"),
-        ),
-      ),
-      // body
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-
-              // name field
-              TextField(
-                controller: _nameController,
-                focusNode: _nameFocusNode,
-                decoration: const InputDecoration(
-                  label: Text("Name"),
-                  hintText: "Enter name",
-                  hintStyle: TextStyle(color: Colors.black38),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-
-              // age field
-              TextField(
-                controller: _ageController,
-                focusNode: _ageFocus,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  label: Text("Age"),
-                  hintText: "Enter age",
-                  hintStyle: TextStyle(color: Colors.black38),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-
-              // save or edit buttton
-              ElevatedButton(
-                onPressed: () async {
-                  if (_saveEditMode == SaveEditMode.save) {
-                    // To save
-                    final personToSave = Person(
-                      name: _nameController.text.trim(),
-                      age: int.tryParse(_ageController.text.trim()) ?? 0,
-                    );
-
-                    await context
-                        .read<PersonModel>()
-                        .insertPerson(personToSave);
-                    _nameController.clear();
-                    _ageController.clear();
-
-                    _unFocusAllFocusNode();
-                  } else {
-                    // To update
-                    final personToUpdate = Person(
-                      id: _personToUpdate?.id,
-                      name: _nameController.text.trim(),
-                      age: int.tryParse(_ageController.text.trim()) ?? 0,
-                    );
-
-                    await context
-                        .read<PersonModel>()
-                        .updatePerson(personToUpdate);
-                    _nameController.clear();
-                    _ageController.clear();
-                    _unFocusAllFocusNode();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _saveEditMode == SaveEditMode.save
-                      ? Colors.green
-                      : Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text(
-                    _saveEditMode == SaveEditMode.save ? "Save" : "Update"),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-
-              // person list view
-              Expanded(
-                child: ListView.separated(
-                  itemBuilder: (context, index) {
-                    final person = _personList[index];
-
-                    return Card(
-                      child: ListTile(
-                        title: Text("Name:- ${person.name}"),
-                        subtitle: Text("Age:- ${person.age}"),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                // take data to update
-                                context
-                                    .read<PersonModel>()
-                                    .bringPersonToUpdate(person);
-                              },
-                              icon: const Icon(Icons.edit),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                // delete data
-                                if (person.id != null) {
-                                  context
-                                      .read<PersonModel>()
-                                      .deletePerson(person.id!);
-                                }
-                              },
-                              color: Colors.red,
-                              icon: const Icon(Icons.delete),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider();
-                  },
-                  itemCount: _personList.length,
-                ),
-              )
-            ],
+        return Scaffold(
+          appBar: AppBar(
+            title: AppBar(
+              title: const Text("Provider"),
+            ),
           ),
-        ),
-      ),
+          // body
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // name field
+                  TextField(
+                    controller: _nameController,
+                    focusNode: _nameFocusNode,
+                    decoration: const InputDecoration(
+                      label: Text("Name"),
+                      hintText: "Enter name",
+                      hintStyle: TextStyle(color: Colors.black38),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // age field
+                  TextField(
+                    controller: _ageController,
+                    focusNode: _ageFocus,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text("Age"),
+                      hintText: "Enter age",
+                      hintStyle: TextStyle(color: Colors.black38),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // save or edit buttton
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_saveEditMode == SaveEditMode.save) {
+                        // To save
+                        final personToSave = Person(
+                          name: _nameController.text.trim(),
+                          age: int.tryParse(_ageController.text.trim()) ?? 0,
+                        );
+
+                        await context
+                            .read<PersonModel>()
+                            .insertPerson(personToSave);
+                        _nameController.clear();
+                        _ageController.clear();
+
+                        _unFocusAllFocusNode();
+                      } else {
+                        // To update
+                        final personToUpdate = Person(
+                          id: _personToUpdate?.id,
+                          name: _nameController.text.trim(),
+                          age: int.tryParse(_ageController.text.trim()) ?? 0,
+                        );
+
+                        await context
+                            .read<PersonModel>()
+                            .updatePerson(personToUpdate);
+                        _nameController.clear();
+                        _ageController.clear();
+                        _unFocusAllFocusNode();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _saveEditMode == SaveEditMode.save
+                          ? Colors.green
+                          : Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text(
+                        _saveEditMode == SaveEditMode.save ? "Save" : "Update"),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // person list view
+                  Expanded(
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        final person = _personList[index];
+
+                        return Card(
+                          child: ListTile(
+                            title: Text("Name:- ${person.name}"),
+                            subtitle: Text("Age:- ${person.age}"),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    // take data to update
+                                    context
+                                        .read<PersonModel>()
+                                        .bringPersonToUpdate(person);
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    // delete data
+                                    if (person.id != null) {
+                                      context
+                                          .read<PersonModel>()
+                                          .deletePerson(person.id!);
+                                    }
+                                  },
+                                  color: Colors.red,
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider();
+                      },
+                      itemCount: _personList.length,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -222,4 +224,3 @@ class _HomeScreenState extends State<HomeScreen> {
     _ageFocus.unfocus();
   }
 }
-
