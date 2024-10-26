@@ -62,9 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PersonModel>(
-      
+     
       builder: (BuildContext context, PersonModel value, Widget? child) {
-       
+        
         _personList = value.personList;
         _saveEditMode = value.saveEditMode;
         _personToUpdate = value.personToUpdate;
